@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historale — Real History or Fake? Daily Trivia Game</title>
+  <meta name="description" content="Can you tell real history from convincing fiction? Test your knowledge in this addictive streak-based trivia game. Real events that sound fake vs fake events that sound real.">
+  <meta name="keywords" content="history game, trivia game, real or fake, daily puzzle, wordle alternative, history quiz">
+
+  <!-- Open Graph / Social Share -->
+  <meta property="og:title" content="Historale — Real History or Fake?">
+  <meta property="og:description" content="Can you tell real history from convincing fiction? Test your knowledge in this addictive trivia game.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://historale.com">
+  <meta property="og:image" content="https://historale.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Historale — Real History or Fake?">
+  <meta name="twitter:description" content="Can you tell real history from convincing fiction?">
+
+  <link rel="canonical" href="https://historale.com">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500&family=Spectral+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    ::selection { background: rgba(160,90,50,0.2); }
+
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background: linear-gradient(170deg, #f5f0e8 0%, #ede6d8 40%, #e8e0d0 100%);
+      color: #3a2f25;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Parchment texture overlay */
+    body::before {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none; z-index: 0;
+      opacity: 0.3;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px 20px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(120,90,50,0.1);
+    }
+    .header-pre {
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      color: rgba(120,90,50,0.35); margin-bottom: 6px;
+    }
+    .header h1 {
+      font-family: 'Spectral SC', serif;
+      font-size: 38px; font-weight: 700; letter-spacing: 6px;
+      color: #3a2f25;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .header-sub {
+      font-size: 15px; color: rgba(80,60,40,0.45);
+      margin-top: 5px; font-style: italic;
+    }
+
+    /* ── Stats Bar ── */
+    .stats {
+      display: flex; justify-content: center; align-items: center; gap: 24px;
+      padding: 10px 0; margin-bottom: 16px;
+      border-bottom: 1px solid rgba(120,90,50,0.08);
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Spectral SC', serif;
+      font-size: 22px; font-weight: 700; color: #3a2f25;
+    }
+    .stat-label {
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(80,60,40,0.3); margin-top: 2px;
+    }
+    .stat-div { width: 1px; height: 24px; background: rgba(120,90,50,0.08); }
+
+    /* ── Streak Banner ── */
+    .streak-banner {
+      text-align: center; font-size: 13px; font-weight: 500;
+      color: rgba(120,90,50,0.5); padding: 4px 0; margin-bottom: 12px;
+      letter-spacing: 1px; animation: fadeUp 0.3s ease-out;
+    }
+
+    /* ── Event Card ── */
+    .event-card {
+      background: linear-gradient(135deg, rgba(255,252,245,0.9), rgba(245,238,225,0.95));
+      border: 1px solid rgba(120,90,50,0.12);
+      border-radius: 6px;
+      padding: 32px 24px 24px;
+      margin-bottom: 16px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 20px rgba(120,90,50,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .event-card.fading { opacity: 0; transform: translateY(8px); }
+
+    /* Wax seal */
+    .seal {
+      position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: radial-gradient(circle, #b84a3a, #8a3028);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Spectral SC', serif; font-size: 16px; font-weight: 700;
+      color: #f5e8d8;
+      box-shadow: 0 2px 8px rgba(160,50,40,0.3);
+      animation: sealPulse 3s ease-in-out infinite;
+    }
+
+    .year-badge {
+      display: inline-block;
+      font-size: 12px; font-weight: 500; letter-spacing: 2px;
+      color: rgba(80,60,40,0.4);
+      border: 1px solid rgba(120,90,50,0.1);
+      padding: 2px 14px; border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .event-text {
+      font-size: 20px; font-weight: 500; color: #3a2f25;
+      line-height: 1.5; font-style: italic;
+      max-width: 420px; margin: 0 auto;
+    }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex; gap: 12px; margin-top: 24px;
+    }
+    .btn-real, .btn-fake {
+      flex: 1; padding: 16px 0;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      border-radius: 6px; border: 1px solid;
+      font-family: 'Spectral SC', serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s ease; letter-spacing: 2px;
+    }
+    .btn-real {
+      background: rgba(34,120,60,0.06); border-color: rgba(34,120,60,0.2);
+      color: #2d7a3e;
+    }
+    .btn-real:hover { background: rgba(34,120,60,0.15); border-color: rgba(34,120,60,0.4); transform: translateY(-2px); }
+    .btn-fake {
+      background: rgba(160,50,40,0.06); border-color: rgba(160,50,40,0.2);
+      color: #a0382a;
+    }
+    .btn-fake:hover { background: rgba(160,50,40,0.12); border-color: rgba(160,50,40,0.35); transform: translateY(-2px); }
+    .btn-icon { font-size: 20px; }
+    .btn-hint { font-size: 10px; opacity: 0.5; font-family: 'Crimson Pro', serif; font-style: italic; letter-spacing: 0; }
+
+    /* ── Reveal ── */
+    .reveal { animation: fadeUp 0.4s ease-out; margin-top: 16px; }
+    .verdict-badge {
+      display: inline-block; padding: 6px 20px; border-radius: 4px;
+      font-weight: 700; font-size: 13px; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .verdict-correct { background: rgba(34,120,60,0.1); border: 1px solid rgba(34,120,60,0.25); color: #2d7a3e; }
+    .verdict-wrong { background: rgba(160,50,40,0.1); border: 1px solid rgba(160,50,40,0.25); color: #a0382a; }
+
+    .truth-label {
+      font-size: 15px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;
+    }
+    .truth-real { color: #2d7a3e; }
+    .truth-fake { color: #a0382a; }
+
+    .explanation {
+      font-size: 14px; color: rgba(80,60,40,0.55);
+      line-height: 1.6; font-style: italic;
+      max-width: 400px; margin: 0 auto;
+      padding: 12px 16px; background: rgba(120,90,50,0.03);
+      border-radius: 4px; border: 1px solid rgba(120,90,50,0.06);
+    }
+
+    /* ── Action Buttons ── */
+    .next-btn, .action-btn {
+      display: block; width: 100%; padding: 14px 0;
+      background: rgba(120,90,50,0.06); border: 1px solid rgba(120,90,50,0.12);
+      border-radius: 4px; color: rgba(80,60,40,0.55);
+      font-family: 'Spectral SC', serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 3px; cursor: pointer; transition: all 0.2s ease;
+      margin-bottom: 10px;
+    }
+    .next-btn:hover, .action-btn:hover {
+      background: rgba(120,90,50,0.12); transform: translateY(-1px);
+    }
+
+    /* ── Game Over ── */
+    .gameover { text-align: center; padding: 20px 0; animation: fadeUp 0.5s ease-out; }
+    .go-title {
+      font-family: 'Spectral SC', serif;
+      font-size: 24px; font-weight: 700; color: #3a2f25; margin-bottom: 4px;
+    }
+    .go-sub {
+      font-size: 15px; color: rgba(80,60,40,0.4); margin-bottom: 16px; font-style: italic;
+    }
+    .go-sub strong { color: #3a2f25; }
+
+    /* Share Card */
+    .share-card {
+      background: linear-gradient(135deg, rgba(255,252,245,0.95), rgba(245,238,225,0.98));
+      border: 1px solid rgba(120,90,50,0.12);
+      border-radius: 6px; padding: 18px 20px; margin-bottom: 16px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(120,90,50,0.05);
+    }
+    .share-title {
+      font-family: 'Spectral SC', serif;
+      font-size: 16px; font-weight: 700; letter-spacing: 3px;
+      color: #3a2f25; margin-bottom: 4px;
+    }
+    .share-result {
+      font-size: 24px; line-height: 1.4; margin: 8px 0;
+      letter-spacing: 2px;
+    }
+    .share-streak {
+      font-size: 13px; color: rgba(80,60,40,0.5); font-style: italic;
+    }
+
+    .go-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .share-btn {
+      padding: 10px 20px; background: transparent;
+      border: 1px solid rgba(120,90,50,0.15); border-radius: 4px;
+      color: rgba(80,60,40,0.5); font-family: 'Crimson Pro', serif;
+      font-size: 13px; cursor: pointer; transition: all 0.2s;
+    }
+    .share-btn:hover { border-color: rgba(120,90,50,0.35); background: rgba(120,90,50,0.04); }
+    .restart-btn {
+      padding: 10px 24px; background: rgba(120,90,50,0.06);
+      border: 1px solid rgba(120,90,50,0.12); border-radius: 4px;
+      color: rgba(80,60,40,0.6);
+      font-family: 'Spectral SC', serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 2px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .restart-btn:hover { background: rgba(120,90,50,0.12); }
+
+    /* ── Ad Spots ── */
+    .ad-spot {
+      background: rgba(120,90,50,0.02);
+      border: 1px dashed rgba(120,90,50,0.08);
+      border-radius: 4px; padding: 12px;
+      text-align: center; margin: 16px 0;
+      min-height: 90px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: rgba(120,90,50,0.15); letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    /* ── More Games ── */
+    .more-games {
+      margin-top: 28px; padding-top: 20px;
+      border-top: 1px solid rgba(120,90,50,0.08);
+      text-align: center;
+    }
+    .more-games-title {
+      font-family: 'Spectral SC', serif;
+      font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(80,60,40,0.3); margin-bottom: 12px;
+    }
+    .game-links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .game-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255,252,245,0.8);
+      border: 1px solid rgba(120,90,50,0.1);
+      border-radius: 6px; text-decoration: none;
+      color: #3a2f25; font-size: 13px; font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .game-link:hover {
+      border-color: rgba(120,90,50,0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(120,90,50,0.08);
+    }
+    .game-link-icon { font-size: 20px; }
+    .game-link-info { text-align: left; }
+    .game-link-name { font-family: 'Spectral SC', serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+    .game-link-desc { font-size: 10px; color: rgba(80,60,40,0.4); font-style: italic; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(120,90,50,0.06);
+    }
+    .footer-text {
+      font-size: 11px; font-style: italic; color: rgba(120,90,50,0.2);
+    }
+
+    /* ── Side Ads (desktop only) ── */
+    .side-ad {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 160px;
+      min-height: 600px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: rgba(120,90,50,0.12);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .side-ad-left { left: calc(50% - 420px); }
+    .side-ad-right { right: calc(50% - 420px); }
+
+    @media (min-width: 1100px) {
+      .side-ad { display: flex; }
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes sealPulse { 0%,100% { box-shadow: 0 0 15px rgba(160,50,40,0.15); } 50% { box-shadow: 0 0 25px rgba(160,50,40,0.25); } }
+
+    /* ── Mobile ── */
+    @media (max-width: 480px) {
+      .header h1 { font-size: 30px; letter-spacing: 4px; }
+      .event-text { font-size: 17px; }
+      .container { padding: 12px 14px 40px; }
+      .event-card { padding: 28px 16px 20px; }
+      .game-links { flex-direction: column; align-items: center; }
+      .game-link { width: 100%; max-width: 280px; }
+    }
+
+    /* Hidden utility */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ══ Side Ads (desktop only, auto-hidden on mobile) ══ -->
+  <div class="side-ad side-ad-left" id="ad-left">
+    <!-- AdSense 160x600 skyscraper -->
+  </div>
+  <div class="side-ad side-ad-right" id="ad-right">
+    <!-- AdSense 160x600 skyscraper -->
+  </div>
+
+  <!-- ══ Header ══ -->
+  <header class="header">
+    <div class="header-pre">Est. Historia</div>
+    <h1>HISTORALE</h1>
+    <p class="header-sub">Real history... or convincing fiction?</p>
+  </header>
+
+  <!-- ══ Stats ══ -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="streak">0</div><div class="stat-label">Streak</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-num" id="best">0</div><div class="stat-label">Best</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-num" id="accuracy">0%</div><div class="stat-label">Accuracy</div></div>
+  </div>
+
+  <!-- ══ Streak Banner ══ -->
+  <div class="streak-banner hidden" id="streak-banner"></div>
+
+  <!-- ══ Event Card ══ -->
+  <div class="event-card" id="event-card">
+    <div class="seal">?</div>
+    <div class="year-badge" id="year-badge"></div>
+    <div class="event-text" id="event-text"></div>
+
+    <!-- Guess Buttons -->
+    <div class="btn-row" id="btn-row">
+      <button class="btn-real" onclick="pick('real')">
+        <span class="btn-icon">✓</span>
+        <span>Real</span>
+        <span class="btn-hint">This actually happened</span>
+      </button>
+      <button class="btn-fake" onclick="pick('fake')">
+        <span class="btn-icon">✗</span>
+        <span>Fake</span>
+        <span class="btn-hint">This is made up</span>
+      </button>
+    </div>
+
+    <!-- Reveal (both correct and wrong) -->
+    <div class="reveal hidden" id="reveal">
+      <div id="verdict-badge" class="verdict-badge"></div>
+      <div id="truth-label" class="truth-label"></div>
+      <div class="explanation" id="explanation"></div>
+    </div>
+  </div>
+
+  <!-- ══ Next Button (correct) ══ -->
+  <button class="next-btn hidden" id="next-btn" onclick="nextEvent()">Next event →</button>
+
+  <!-- ══ Game Over Buttons (wrong — same position as Next btn) ══ -->
+  <div id="gameover-buttons" style="display:none; gap: 8px; margin-bottom: 10px;">
+    <button class="share-btn" id="share-btn" onclick="shareResult()" style="flex:1;">📋 Share result</button>
+    <button class="restart-btn" onclick="restart()" style="flex:1;">Try again</button>
+  </div>
+
+  <!-- ══ Game Over Details (scroll down to see) ══ -->
+  <div class="gameover hidden" id="gameover-details">
+    <div class="go-title" id="go-title"></div>
+    <div class="go-sub" id="go-sub"></div>
+
+    <!-- Share Card -->
+    <div class="share-card">
+      <div class="share-title">HISTORALE 📜</div>
+      <div class="share-result" id="share-result"></div>
+      <div class="share-streak" id="share-streak"></div>
+    </div>
+  </div>
+
+  <!-- ══ Ad Spot: Post-Game ══ -->
+  <div class="ad-spot hidden" id="ad-postgame">
+    <!-- AdSense or Mediavine ad unit here -->
+  </div>
+
+  <!-- ══ More Games ══ -->
+  <div class="more-games">
+    <div class="more-games-title">More Games</div>
+    <div class="game-links">
+      <a href="https://populle.com" class="game-link" target="_blank">
+        <span class="game-link-icon">🌍</span>
+        <div class="game-link-info">
+          <div class="game-link-name">Populle</div>
+          <div class="game-link-desc">Which has more people?</div>
+        </div>
+      </a>
+      <a href="#" class="game-link">
+        <span class="game-link-icon">⚖️</span>
+        <div class="game-link-info">
+          <div class="game-link-name">Coming Soon</div>
+          <div class="game-link-desc">Real law or legal fiction?</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ Footer ══ -->
+  <footer class="footer">
+    <p class="footer-text">Separating fact from fiction since historia</p>
+    <p class="footer-text" style="margin-top:4px; font-size:9px;">© 2026 Historale · All facts verified · All fiction convincing</p>
+  </footer>
+
+</div>
+
+<script>
+// ─── Events Database ────────────────────────────────────────────────────────
+const EVENTS=[
+  // === REAL ===
+  {text:"Australia once lost a war against emus",year:"1932",real:true,explanation:"The Great Emu War — the Australian military deployed soldiers with machine guns against 20,000 emus destroying crops. The emus won."},
+  {text:"Oxford University is older than the Aztec Empire",year:"1096 vs 1428",real:true,explanation:"Teaching at Oxford began around 1096. The Aztec Empire wasn't founded until 1428 — over 300 years later."},
+  {text:"Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid",year:"69 BC",real:true,explanation:"The Great Pyramid was built around 2560 BC. Cleopatra died in 30 BC. The Moon landing was 1969. She's closer to us by about 500 years."},
+  {text:"A pope once put a dead body on trial",year:"897",real:true,explanation:"The Cadaver Synod — Pope Stephen VI had the corpse of Pope Formosus exhumed, dressed in papal robes, and put on trial for perjury."},
+  {text:"The shortest war in history lasted 38 minutes",year:"1896",real:true,explanation:"The Anglo-Zanzibar War. Britain gave Zanzibar an ultimatum; when they refused, the British navy opened fire. Zanzibar surrendered in 38 minutes."},
+  {text:"Ancient Romans used urine as mouthwash",year:"~100 AD",real:true,explanation:"Roman physicians prescribed urine (especially Portuguese urine, which was imported) for teeth whitening. The ammonia in it actually works as a cleaning agent."},
+  {text:"Napoleon was once attacked by a horde of rabbits",year:"1807",real:true,explanation:"After signing the Treaties of Tilsit, Napoleon organized a rabbit hunt. 3,000 rabbits were released but instead of fleeing, they charged Napoleon, forcing him to retreat."},
+  {text:"A chicken lived for 18 months without its head",year:"1945",real:true,explanation:"Mike the Headless Chicken survived because the axe missed the brain stem. His owner fed him with an eyedropper. He toured as a sideshow attraction."},
+  {text:"The Great Fire of London destroyed 13,200 houses but officially killed only 6 people",year:"1666",real:true,explanation:"The official death toll was only 6 — though historians believe the true number was much higher, as deaths of the poor went unrecorded."},
+  {text:"Ancient Egyptians used slabs of stone as pillows",year:"~3000 BC",real:true,explanation:"Egyptian headrests were carved from stone, wood, or ivory. They elevated the head to maintain airflow and keep bugs away from the face."},
+  {text:"Turkeys were once worshipped as gods by the Mayans",year:"~300 BC",real:true,explanation:"The Mayans associated turkeys with their trickster god and raised them for both religious ceremonies and food."},
+  {text:"Forks were once considered sacrilegious by the Catholic Church",year:"~1100",real:true,explanation:"When a Byzantine princess brought forks to Venice in 1004, church leaders condemned them as an insult to God — since God gave us natural forks (fingers)."},
+  {text:"Ancient Greeks used broken pottery as toilet paper",year:"~500 BC",real:true,explanation:"Called pessoi — smooth pottery shards were used for cleaning. Some had enemies' names inscribed on them for extra satisfaction."},
+  {text:"Ketchup was sold as medicine in the 1830s",year:"1834",real:true,explanation:"Dr. John Cook Bennett claimed tomato ketchup could cure diarrhea, indigestion, and jaundice. He sold it in pill form."},
+  {text:"During WWII, the British created a plan to turn Hitler into a woman using estrogen",year:"1943",real:true,explanation:"British spies planned to smuggle estrogen into Hitler's food to make him less aggressive. The plan was never executed."},
+  {text:"The last guillotine execution in France happened the same year Star Wars was released",year:"1977",real:true,explanation:"Hamida Djandoubi was executed by guillotine in Marseille on September 10, 1977. Star Wars premiered May 25 of the same year."},
+  {text:"Liechtenstein went to war with 80 soldiers and returned with 81",year:"1866",real:true,explanation:"During the Austro-Prussian War, Liechtenstein sent 80 soldiers. They returned with 81 — having made a new friend (an Austrian liaison officer)."},
+  {text:"Carrots were originally purple, not orange",year:"~900 AD",real:true,explanation:"Wild carrots were purple or white. Dutch growers bred orange carrots in the 17th century — possibly to honor William of Orange."},
+  {text:"Tug of war was an Olympic sport",year:"1900-1920",real:true,explanation:"It appeared in 5 consecutive Olympics. The UK won the most medals. It was dropped after 1920."},
+  {text:"In medieval England, animals could be tried and convicted in court",year:"~1300s",real:true,explanation:"Pigs, rats, and insects were formally prosecuted. A pig was once hanged for murdering a child. Lawyers were appointed to defend the animals."},
+  {text:"Honey never spoils — 3,000-year-old honey from Egyptian tombs was still edible",year:"Various",real:true,explanation:"Honey's low moisture, acidity, and hydrogen peroxide production make it essentially immortal. Perfectly preserved honey was found in ancient tombs."},
+  {text:"The Eiffel Tower can grow up to 15cm taller in summer",year:"Ongoing",real:true,explanation:"Thermal expansion of the iron means the tower grows in hot weather and shrinks in cold — up to 15cm of difference."},
+  {text:"Woolly mammoths were still alive when the Great Pyramid was being built",year:"~2500 BC",real:true,explanation:"A small population survived on Wrangel Island in the Arctic until about 2000 BC — 500 years after the pyramids."},
+  {text:"During WWII, the US military built inflatable tanks to fool German scouts",year:"1944",real:true,explanation:"The Ghost Army — a secret unit of artists and engineers created inflatable tanks, trucks, and sound effects to deceive the enemy about troop positions."},
+  {text:"Scotland's national animal is the unicorn",year:"12th century",real:true,explanation:"The unicorn has been a Scottish heraldic symbol since the 12th century. It's featured on the Royal Coat of Arms of Scotland."},
+  {text:"Albert Einstein was offered the presidency of Israel",year:"1952",real:true,explanation:"After the death of President Weizmann, Einstein was offered the role. He declined, saying he lacked 'the natural aptitude and experience.'"},
+  {text:"A baboon named Jackie was promoted to corporal in WWI",year:"1915",real:true,explanation:"Jackie was a tame baboon who served with the 3rd South African Infantry. He was wounded at Passchendaele and officially promoted."},
+  {text:"The Roman Emperor Caligula planned to make his horse a senator",year:"~39 AD",real:true,explanation:"Caligula reportedly intended to appoint his horse Incitatus to the Senate — possibly as a deliberate insult to the senators."},
+  {text:"A dog was elected mayor of a California town",year:"1981",real:true,explanation:"Bosco the dog served as honorary mayor of Sunol, California from 1981 until his death in 1994."},
+  {text:"In the US Prohibition era, the government poisoned alcohol to discourage drinking, killing thousands",year:"1926-1933",real:true,explanation:"The government ordered industrial alcohol to be poisoned with methanol and other chemicals. An estimated 10,000 people died from government-poisoned alcohol."},
+
+  // === FAKE ===
+  {text:"Julius Caesar banned left-handed people from serving in the Roman Senate",year:"~50 BC",real:false,explanation:"Invented. While left-handedness was considered unlucky in Rome (the Latin word 'sinister' means 'left'), there was no such ban."},
+  {text:"Queen Victoria kept a pet octopus in a specially built aquarium at Buckingham Palace",year:"1855",real:false,explanation:"Invented. While Victoria had many pets including parrots and dogs, there's no record of a pet octopus."},
+  {text:"In 1789, the French National Assembly briefly outlawed the color purple as a symbol of monarchy",year:"1789",real:false,explanation:"Invented. While the Revolution targeted symbols of monarchy, purple was never formally banned as a color."},
+  {text:"Thomas Edison invented a machine that could communicate with ghosts",year:"1920",real:false,explanation:"Edison mentioned interest in a 'spirit phone' in a magazine interview, but he was almost certainly joking. No such device was ever built."},
+  {text:"Ancient Spartans selected their kings through an annual wrestling tournament",year:"~600 BC",real:false,explanation:"Invented. Sparta had a hereditary dual monarchy — two kings ruled simultaneously from two royal families."},
+  {text:"In 1347, the Pope issued a decree blaming cats for the Black Plague, ordering millions killed",year:"1347",real:false,explanation:"A popular myth. While cats were sometimes associated with witchcraft, there was no papal decree ordering their killing."},
+  {text:"Marco Polo brought the recipe for fireworks from China to Italy in 1295",year:"1295",real:false,explanation:"Invented. While Polo traveled to China, gunpowder likely reached Europe through the Silk Road and Arab traders, not through Polo."},
+  {text:"Leonardo da Vinci designed a submarine that was built and tested in Venice's lagoon",year:"1505",real:false,explanation:"Da Vinci did sketch a submarine-like vessel, but there's no evidence one was ever built or tested during his lifetime."},
+  {text:"During the Renaissance, Venice passed a law banning gondoliers from singing opera",year:"~1550",real:false,explanation:"Invented. Gondoliers were actually famous for their singing — it was a beloved tradition, not a banned practice."},
+  {text:"The Vikings discovered coffee beans on their voyages to North Africa",year:"~870 AD",real:false,explanation:"Invented. Coffee originated in Ethiopia and was first cultivated in Yemen around the 15th century. Vikings did not voyage to North Africa."},
+  {text:"During the Spanish Inquisition, playing chess on Sundays was punishable by 40 lashes",year:"~1480",real:false,explanation:"Invented. While the Inquisition had many strange prohibitions, chess on Sundays was not specifically banned."},
+  {text:"The Mongol Empire had a law that anyone who spilled milk would be executed",year:"~1220",real:false,explanation:"While Mongols deeply revered dairy products, the death penalty for spilling milk is a fabrication and exaggeration."},
+  {text:"Benjamin Franklin formally proposed the turkey as the national bird of the United States",year:"1784",real:false,explanation:"A common myth. Franklin praised the turkey in a private letter to his daughter and criticized the eagle, but he never formally proposed it."},
+  {text:"Ancient Athens had a law requiring citizens to bathe publicly at least once a week",year:"~450 BC",real:false,explanation:"Invented. While bathing was valued in Greek culture, Athens had no compulsory bathing law."},
+  {text:"The ancient Persians punished liars by requiring them to eat only raw garlic for a month",year:"~500 BC",real:false,explanation:"Invented. Honesty was valued in Zoroastrian-influenced Persian culture, but this specific punishment doesn't appear in any historical record."},
+  {text:"Catherine the Great issued a decree requiring all nobles to learn at least three card games",year:"1775",real:false,explanation:"Invented. Catherine was a patron of arts and education, but there was no card game decree."},
+  {text:"During the Black Death, some towns hired musicians to play joyful music 24 hours a day to ward off plague",year:"1348",real:false,explanation:"Invented. While people tried desperate measures including self-flagellation and burning herbs, continuous joyful music wasn't among them."},
+  {text:"In 1610, Galileo discovered a fifth moon of Jupiter but kept it secret from the Inquisition",year:"1610",real:false,explanation:"Galileo discovered four moons (the Galilean moons). He didn't discover a fifth, and he openly published his findings."},
+  {text:"Cleopatra invented a primitive form of lip gloss using crushed beetles and fish scales",year:"~40 BC",real:false,explanation:"Ancient Egyptians used cosmetics with carmine beetles and pigments, but attributing the 'invention' to Cleopatra specifically is fabricated."},
+  {text:"The Library of Alexandria was partially destroyed when Caesar's troops used scrolls as kindling",year:"48 BC",real:false,explanation:"While Caesar's civil war caused a fire near the library, the scrolls-as-kindling story is invented. The library's decline was gradual over centuries."},
+  {text:"A Roman Emperor once appointed a 4-year-old child as governor of Egypt",year:"~200 AD",real:false,explanation:"Invented. While Rome had young emperors (Elagabalus became emperor at 14), a 4-year-old governor is fiction."},
+  {text:"Ancient Egyptian pharaohs had servants whose sole job was to keep flies away by covering themselves in honey",year:"~2500 BC",real:false,explanation:"A common internet 'fact' with no basis in Egyptology. There's no archaeological evidence for honey-covered fly catchers."},
+  {text:"The ancient Olympic Games included a poetry competition alongside athletic events",year:"~500 BC",real:false,explanation:"The modern Olympics (1912-1948) had art competitions. But the ancient Olympics were purely athletic — no poetry events."},
+  {text:"It is illegal to whistle underwater in Vermont",year:"Present",real:false,explanation:"A frequently shared 'weird law' that doesn't actually exist in any legal code. It's also physically impossible."},
+  {text:"In medieval Japan, all samurai were required to test new swords on executed criminals",year:"~1400s",real:false,explanation:"While 'tameshigiri' (test cutting) existed, it was not standard practice required of all samurai. This is a misleading generalization."},
+  {text:"Ancient Romans had a god specifically dedicated to protecting sewage systems",year:"~300 BC",real:false,explanation:"Romans had a goddess of the sewer (Cloacina), but she was originally a deity of purification associated with the Cloaca Maxima — this statement oversimplifies the myth."},
+  {text:"The Great Wall of China can be seen from the Moon with the naked eye",year:"General myth",real:false,explanation:"One of the most persistent myths. The Wall is only about 6 meters wide — far too narrow to see from space, let alone the Moon."},
+  {text:"Christopher Columbus proved the Earth was round by sailing to America",year:"1492",real:false,explanation:"Educated Europeans already knew the Earth was round since ancient Greek times. Columbus's achievement was the voyage itself, not proving the shape of Earth."},
+  {text:"Marie Antoinette actually said 'Let them eat cake'",year:"1789",real:false,explanation:"There's no evidence she ever said this. The phrase appeared in Rousseau's writings years before she was even born, attributed to an unnamed princess."},
+  {text:"Viking warriors wore horned helmets into battle",year:"~800 AD",real:false,explanation:"Pure myth popularized by 19th-century romanticists. Real Viking helmets were simple rounded iron or leather caps with no horns."},
+];
+
+// ─── State ──────────────────────────────────────────────────────────────────
+let events = shuffle([...EVENTS]);
+let idx = 0;
+let streak = 0;
+let bestStreak = parseInt(localStorage.getItem('historale-best') || '0');
+let played = parseInt(localStorage.getItem('historale-played') || '0');
+let wins = parseInt(localStorage.getItem('historale-wins') || '0');
+let phase = 'guess';
+let history = []; // track results for share: ✅ or ❌
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+// ─── DOM refs ───────────────────────────────────────────────────────────────
+const $streak = document.getElementById('streak');
+const $best = document.getElementById('best');
+const $accuracy = document.getElementById('accuracy');
+const $streakBanner = document.getElementById('streak-banner');
+const $eventCard = document.getElementById('event-card');
+const $yearBadge = document.getElementById('year-badge');
+const $eventText = document.getElementById('event-text');
+const $btnRow = document.getElementById('btn-row');
+const $reveal = document.getElementById('reveal');
+const $verdictBadge = document.getElementById('verdict-badge');
+const $truthLabel = document.getElementById('truth-label');
+const $explanation = document.getElementById('explanation');
+const $nextBtn = document.getElementById('next-btn');
+const $goButtons = document.getElementById('gameover-buttons');
+const $gameover = document.getElementById('gameover-details');
+const $goTitle = document.getElementById('go-title');
+const $goSub = document.getElementById('go-sub');
+const $shareResult = document.getElementById('share-result');
+const $shareStreak = document.getElementById('share-streak');
+const $shareBtn = document.getElementById('share-btn');
+const $adPostgame = document.getElementById('ad-postgame');
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+function updateStats() {
+  $streak.textContent = streak;
+  $best.textContent = bestStreak;
+  $accuracy.textContent = played > 0 ? Math.round(wins / played * 100) + '%' : '0%';
+}
+
+function showEvent() {
+  const e = events[idx % events.length];
+  $yearBadge.textContent = e.year;
+  $eventText.textContent = '"' + e.text + '"';
+  $btnRow.classList.remove('hidden');
+  $reveal.classList.add('hidden');
+  $nextBtn.classList.add('hidden');
+  $goButtons.style.display = 'none';
+  $gameover.classList.add('hidden');
+  $adPostgame.classList.add('hidden');
+  updateStats();
+  updateStreakBanner();
+
+  // Refill if running low
+  if (idx >= events.length - 3) {
+    events = [...events, ...shuffle([...EVENTS])];
+  }
+}
+
+function updateStreakBanner() {
+  if (streak >= 3 && phase !== 'gameover') {
+    const scrolls = '📜'.repeat(Math.min(streak, 12));
+    $streakBanner.textContent = scrolls + ' ' + streak + ' in a row!';
+    $streakBanner.classList.remove('hidden');
+  } else {
+    $streakBanner.classList.add('hidden');
+  }
+}
+
+// ─── Gameplay ───────────────────────────────────────────────────────────────
+function pick(answer) {
+  if (phase !== 'guess') return;
+  const e = events[idx % events.length];
+  const isCorrect = (answer === 'real' && e.real) || (answer === 'fake' && !e.real);
+
+  played++;
+  localStorage.setItem('historale-played', played);
+
+  // Hide guess buttons, show reveal
+  $btnRow.classList.add('hidden');
+  $reveal.classList.remove('hidden');
+
+  // Set the reveal content
+  $truthLabel.textContent = e.real ? 'This is REAL history' : 'This is FAKE';
+  $truthLabel.className = 'truth-label ' + (e.real ? 'truth-real' : 'truth-fake');
+  $explanation.textContent = e.explanation;
+
+  if (isCorrect) {
+    history.push('✅');
+    streak++;
+    wins++;
+    localStorage.setItem('historale-wins', wins);
+    if (streak > bestStreak) { bestStreak = streak; localStorage.setItem('historale-best', bestStreak); }
+    $verdictBadge.textContent = '✓ Correct!';
+    $verdictBadge.className = 'verdict-badge verdict-correct';
+    phase = 'reveal';
+    $nextBtn.classList.remove('hidden');
+  } else {
+    history.push('❌');
+    $verdictBadge.textContent = '✗ Wrong!';
+    $verdictBadge.className = 'verdict-badge verdict-wrong';
+    phase = 'gameover';
+    // Show try again / share buttons in same spot as Next button
+    $goButtons.style.display = 'flex';
+    setTimeout(showGameOver, 100);
+  }
+
+  updateStats();
+  updateStreakBanner();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextEvent() {
+  $eventCard.classList.add('fading');
+  setTimeout(() => {
+    idx++;
+    phase = 'guess';
+    showEvent();
+    $eventCard.classList.remove('fading');
+  }, 200);
+}
+
+function showGameOver() {
+  $nextBtn.classList.add('hidden');
+  $gameover.classList.remove('hidden');
+  $adPostgame.classList.remove('hidden');
+  $streakBanner.classList.add('hidden');
+
+  const title = streak === 0 ? 'Bamboozled!' : streak < 5 ? 'Not bad!' : streak < 10 ? 'History buff!' : streak < 20 ? 'Professor!' : 'Legendary historian!';
+  $goTitle.textContent = title;
+  $goSub.innerHTML = 'You spotted <strong>' + streak + '</strong> in a row';
+
+  // Build share result
+  const emojis = history.slice(-Math.min(history.length, 20)).join('');
+  $shareResult.textContent = emojis;
+  $shareStreak.textContent = streak + ' correct · ' + Math.round(wins/played*100) + '% accuracy';
+}
+
+function shareResult() {
+  const emojis = history.slice(-Math.min(history.length, 20)).join('');
+  const text = 'Historale 📜 — ' + streak + ' in a row!\n' + emojis + '\n' + Math.round(wins/played*100) + '% accuracy\nhttps://historale.com';
+
+  if (navigator.share) {
+    navigator.share({ title: 'Historale', text: text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text);
+    $shareBtn.textContent = '✓ Copied!';
+    setTimeout(() => { $shareBtn.textContent = '📋 Share result'; }, 2500);
+  }
+}
+
+function restart() {
+  events = shuffle([...EVENTS]);
+  idx = 0;
+  streak = 0;
+  phase = 'guess';
+  history = [];
+  showEvent();
+  $gameover.classList.add('hidden');
+  $goButtons.style.display = 'none';
+  $adPostgame.classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+showEvent();
+</script>
+
+</body>
+</html>
