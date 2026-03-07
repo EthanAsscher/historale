@@ -479,11 +479,11 @@
           <div class="game-link-desc">Which has more people?</div>
         </div>
       </a>
-      <a href="#" class="game-link">
-        <span class="game-link-icon">⚖️</span>
+      <a href="https://spydlegame.com" class="game-link" target="_blank">
+        <span class="game-link-icon">🕵️</span>
         <div class="game-link-info">
-          <div class="game-link-name">Coming Soon</div>
-          <div class="game-link-desc">Real law or legal fiction?</div>
+          <div class="game-link-name">Spydle</div>
+          <div class="game-link-desc">Crack the daily spy cipher</div>
         </div>
       </a>
     </div>
@@ -573,7 +573,7 @@ let bestStreak = parseInt(localStorage.getItem('historale-best') || '0');
 let played = parseInt(localStorage.getItem('historale-played') || '0');
 let wins = parseInt(localStorage.getItem('historale-wins') || '0');
 let phase = 'guess';
-let history = []; // track results for share: ✅ or ❌
+let history = []; // track results for share
 
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
@@ -623,7 +623,6 @@ function showEvent() {
   updateStats();
   updateStreakBanner();
 
-  // Refill if running low
   if (idx >= events.length - 3) {
     events = [...events, ...shuffle([...EVENTS])];
   }
@@ -631,7 +630,7 @@ function showEvent() {
 
 function updateStreakBanner() {
   if (streak >= 3 && phase !== 'gameover') {
-    const scrolls = '📜'.repeat(Math.min(streak, 12));
+    const scrolls = String.fromCodePoint(0x1F4DC).repeat(Math.min(streak, 12));
     $streakBanner.textContent = scrolls + ' ' + streak + ' in a row!';
     $streakBanner.classList.remove('hidden');
   } else {
@@ -648,31 +647,28 @@ function pick(answer) {
   played++;
   localStorage.setItem('historale-played', played);
 
-  // Hide guess buttons, show reveal
   $btnRow.classList.add('hidden');
   $reveal.classList.remove('hidden');
 
-  // Set the reveal content
   $truthLabel.textContent = e.real ? 'This is REAL history' : 'This is FAKE';
   $truthLabel.className = 'truth-label ' + (e.real ? 'truth-real' : 'truth-fake');
   $explanation.textContent = e.explanation;
 
   if (isCorrect) {
-    history.push('✅');
+    history.push(String.fromCodePoint(0x2705));
     streak++;
     wins++;
     localStorage.setItem('historale-wins', wins);
     if (streak > bestStreak) { bestStreak = streak; localStorage.setItem('historale-best', bestStreak); }
-    $verdictBadge.textContent = '✓ Correct!';
+    $verdictBadge.textContent = String.fromCodePoint(0x2713) + ' Correct!';
     $verdictBadge.className = 'verdict-badge verdict-correct';
     phase = 'reveal';
     $nextBtn.classList.remove('hidden');
   } else {
-    history.push('❌');
-    $verdictBadge.textContent = '✗ Wrong!';
+    history.push(String.fromCodePoint(0x274C));
+    $verdictBadge.textContent = String.fromCodePoint(0x2717) + ' Wrong!';
     $verdictBadge.className = 'verdict-badge verdict-wrong';
     phase = 'gameover';
-    // Show try again / share buttons in same spot as Next button
     $goButtons.style.display = 'flex';
     setTimeout(showGameOver, 100);
   }
@@ -702,22 +698,21 @@ function showGameOver() {
   $goTitle.textContent = title;
   $goSub.innerHTML = 'You spotted <strong>' + streak + '</strong> in a row';
 
-  // Build share result
   const emojis = history.slice(-Math.min(history.length, 20)).join('');
   $shareResult.textContent = emojis;
-  $shareStreak.textContent = streak + ' correct · ' + Math.round(wins/played*100) + '% accuracy';
+  $shareStreak.textContent = streak + ' correct ' + String.fromCodePoint(0x00B7) + ' ' + Math.round(wins/played*100) + '% accuracy';
 }
 
 function shareResult() {
   const emojis = history.slice(-Math.min(history.length, 20)).join('');
-  const text = 'Historale 📜 — ' + streak + ' in a row!\n' + emojis + '\n' + Math.round(wins/played*100) + '% accuracy\nhttps://historale.com';
+  const text = 'Historale ' + String.fromCodePoint(0x1F4DC) + ' ' + String.fromCodePoint(0x2014) + ' ' + streak + ' in a row!\n' + emojis + '\n' + Math.round(wins/played*100) + '% accuracy\nhttps://historale.com';
 
   if (navigator.share) {
     navigator.share({ title: 'Historale', text: text }).catch(() => {});
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(text);
-    $shareBtn.textContent = '✓ Copied!';
-    setTimeout(() => { $shareBtn.textContent = '📋 Share result'; }, 2500);
+    $shareBtn.textContent = String.fromCodePoint(0x2713) + ' Copied!';
+    setTimeout(() => { $shareBtn.textContent = String.fromCodePoint(0x1F4CB) + ' Share result'; }, 2500);
   }
 }
 
